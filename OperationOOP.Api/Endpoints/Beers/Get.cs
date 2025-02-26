@@ -2,7 +2,7 @@
 
 namespace OperationOOP.Api.Endpoints.Beers;
 
-public class GetBeer : IEndpoint
+public class BeerGet : IEndpoint
 {
 
     public static void MapEndpoint(IEndpointRouteBuilder app) => app

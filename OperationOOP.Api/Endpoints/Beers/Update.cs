@@ -1,7 +1,7 @@
 ﻿using OperationOOP.Core.Models;
 
 namespace OperationOOP.Api.Endpoints.Beers;
-public class UpdateBeer : IEndpoint
+public class BeerUpdate : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app) => app
         .MapPut("/beer/{id}", Handle)

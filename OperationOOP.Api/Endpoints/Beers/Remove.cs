@@ -1,5 +1,5 @@
 ﻿namespace OperationOOP.Api.Endpoints.Beers;
-public class RemoveBeer : IEndpoint
+public class BeerRemove : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app) => app
         .MapDelete("/beer/{id}", Handle)

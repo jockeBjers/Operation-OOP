@@ -1,44 +1,34 @@
-﻿namespace OperationOOP.Api.Endpoints.Beers;
+﻿using System.Reflection.Metadata;
 
+namespace OperationOOP.Api.Endpoints.Sodas;
 
-public class BeerGetAll : IEndpoint
+public class SodaGetAll : IEndpoint
 {
     // Mapping
     public static void MapEndpoint(IEndpointRouteBuilder app) => app
-        .MapGet("/beer", Handle)
-        .WithSummary("beers");
+        .MapGet("/Soda", Handle)
+        .WithSummary("Sodas");
 
-    // Request and Response types
     public record Response(
-
         int Id,
         string Name,
         double Volume,
         decimal Price,
         int Quantity,
-        double AlcoholContent,
-        BeerType Type,
-        BitternessLevel Bitterness
+        bool IsSugarFree
     );
 
-    //Logic
     private static List<Response> Handle(IDatabase db)
     {
         return db.Drinks
-            .OfType<Beer>()
+            .OfType<Soda>()
             .Select(item => new Response(
                 Id: item.Id,
                 Name: item.Name,
                 Volume: item.Volume,
                 Price: item.Price,
                 Quantity: item.Quantity,
-                AlcoholContent: item.AlcoholContent,
-                Type: item.Type,
-                Bitterness: item.Bitterness
+                IsSugarFree: item.IsSugarFree
             )).ToList();
     }
-
-
 }
-
-

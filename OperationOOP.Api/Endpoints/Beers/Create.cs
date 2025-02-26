@@ -1,5 +1,5 @@
 ﻿namespace OperationOOP.Api.Endpoints.Beers;
-public class CreateBeer : IEndpoint
+public class BeerCreate : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app) => app
         .MapPost("/beer", Handle)
