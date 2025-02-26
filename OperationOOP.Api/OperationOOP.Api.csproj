@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Endpoints\Beer\" />
     <Folder Include="Endpoints\Soda\" />
     <Folder Include="Endpoints\Wine\" />
   </ItemGroup>
