@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OperationOOP.Core.Models;
 
-class Soda : Beverage
+public class Soda : Beverage
 {
     public bool IsSugarFree { get; set; }
     public Soda(int id, string name, double volume, decimal price, int quantity, bool isSugarFree)

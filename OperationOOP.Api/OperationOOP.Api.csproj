@@ -15,4 +15,10 @@
     <ProjectReference Include="..\OperationOOP.Core\OperationOOP.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Endpoints\Beer\" />
+    <Folder Include="Endpoints\Soda\" />
+    <Folder Include="Endpoints\Wine\" />
+  </ItemGroup>
+
 </Project>

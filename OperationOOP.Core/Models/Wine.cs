@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OperationOOP.Core.Models;
 
-class Wine : Beverage, IAlcoholicBeverage
+public class Wine : Beverage, IAlcoholicBeverage
 {
     public double AlcoholContent { get; set; }
     public WineType Type { get; set; }
