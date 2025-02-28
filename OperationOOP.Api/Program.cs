@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using OperationOOP.Api.Endpoints;
 using OperationOOP.Core.Data;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace OperationOOP.Api
 {
@@ -22,6 +23,10 @@ namespace OperationOOP.Api
                 options.InferSecuritySchemes();
             });
 
+            builder.Services.AddSingleton<IWineService, WineService>();
+            builder.Services.AddSingleton<IBeerService, BeerService>();
+            builder.Services.AddSingleton<ISodaService, SodaService>();
+            builder.Services.AddSingleton<IBeverageService, BeverageService>();
             builder.Services.AddSingleton<IDatabase, Database>();
 
             var app = builder.Build();
@@ -30,7 +35,10 @@ namespace OperationOOP.Api
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.DefaultModelsExpandDepth(-1);
+                });
             }
 
             app.UseHttpsRedirection();
