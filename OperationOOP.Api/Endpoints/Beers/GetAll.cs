@@ -13,7 +13,7 @@ public class BeerGetAll : IEndpoint
 
         int Id,
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         double AlcoholContent,
@@ -22,10 +22,9 @@ public class BeerGetAll : IEndpoint
     );
 
     //Logic
-    private static List<Response> Handle(IDatabase db)
+    private static IResult Handle(IBeerService service)
     {
-        return db.Drinks
-            .OfType<Beer>()
+        var list = service.GetAllBeers()
             .Select(item => new Response(
                 Id: item.Id,
                 Name: item.Name,
@@ -36,6 +35,7 @@ public class BeerGetAll : IEndpoint
                 Type: item.Type,
                 Bitterness: item.Bitterness
             )).ToList();
+        return Results.Ok(list);
     }
 
 

@@ -7,13 +7,12 @@ public class BeerRemove : IEndpoint
 
     public record Response(int Id);
 
-    private static Ok<Response> Handle(int id, IDatabase db)
+    private static IResult Handle(int id, IBeerService service)
     {
-        var beer = db.Drinks.OfType<Beer>().FirstOrDefault(b => b.Id == id);
+        service.RemoveBeer(id);
 
+        if (service.GetBeerById(id) is null) return Results.NotFound();
 
-        db.Drinks.Remove(beer);
-
-        return TypedResults.Ok(new Response(beer.Id));
+        return TypedResults.Ok(new Response(id));
     }
 }

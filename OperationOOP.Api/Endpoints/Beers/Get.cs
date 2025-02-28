@@ -15,7 +15,7 @@ public class BeerGet : IEndpoint
 
         int Id,
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         double AlcoholContent,
@@ -23,26 +23,22 @@ public class BeerGet : IEndpoint
         BitternessLevel Bitterness
     );
 
-    private static Response Handle([AsParameters] Request request, IDatabase db)
+    private static IResult Handle([AsParameters] Request request, IBeerService service)
     {
+        var beer = service.GetBeerById(request.Id);
+        if (beer is null) return Results.NotFound();
 
-        var beverage = db.Drinks.Find(b => b.Id == request.Id);
+        var response = new Response(
+            Id: beer.Id,
+            Name: beer.Name,
+            Volume: beer.Volume,
+            Price: beer.Price,
+            Quantity: beer.Quantity,
+            AlcoholContent: beer.AlcoholContent,
+            Type: beer.Type,
+            Bitterness: beer.Bitterness
+        );
 
-        if (beverage is Beer beer)
-        {
-            var response = new Response(
-                Id: beer.Id,
-                Name: beer.Name,
-                Volume: beer.Volume,
-                Price: beer.Price,
-                Quantity: beer.Quantity,
-                AlcoholContent: beer.AlcoholContent,
-                Type: beer.Type,
-                Bitterness: beer.Bitterness
-            );
-            return response;
-        }
-        return null;
+        return Results.Ok(response);
     }
-
 }

@@ -1,4 +1,7 @@
-﻿namespace OperationOOP.Api.Endpoints.Beers;
+﻿using FluentValidation;
+using OperationOOP.Api.Validators;
+
+namespace OperationOOP.Api.Endpoints.Beers;
 public class BeerCreate : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app) => app
@@ -7,7 +10,7 @@ public class BeerCreate : IEndpoint
 
     public record Request(
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         double AlcoholContent,
@@ -17,11 +20,12 @@ public class BeerCreate : IEndpoint
 
     public record Response(int Id);
 
-    private static Ok<Response> Handle(Request request, IDatabase db)
+
+    // change the return type to IResult so we can return NotFound and not just Ok
+    private static IResult Handle(Request request, IBeerService service)
     {
-        // add 
         var beer = new Beer(
-              id: db.Drinks.Max(b => b.Id) + 1,
+              id: 0,
               name: request.Name,
               volume: request.Volume,
               price: request.Price,
@@ -31,8 +35,15 @@ public class BeerCreate : IEndpoint
               bitterness: request.Bitterness
           );
 
-        db.Drinks.Add(beer);
+        var validator = new BeerValidator();
+        var result = validator.Validate(beer);
 
+        if (!result.IsValid)
+        {
+            return Results.BadRequest();
+        }
+
+        beer = service.CreateBeer(beer);
         return TypedResults.Ok(new Response(beer.Id));
     }
 }
