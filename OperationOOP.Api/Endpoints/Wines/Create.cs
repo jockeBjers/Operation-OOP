@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using OperationOOP.Api.Validators;
+using System.Reflection.Metadata;
 
 namespace OperationOOP.Api.Endpoints.Wines;
 
@@ -11,7 +12,7 @@ public class WineCreate : IEndpoint
 
     public record Request(
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         double AlcoholContent,
@@ -21,10 +22,10 @@ public class WineCreate : IEndpoint
     );
     public record Response(int Id);
 
-    private static Ok<Response> Handle(Request request, IDatabase db)
+    private static IResult Handle(Request request, IWineService service)
     {
         var wine = new Wine(
-            id: db.Drinks.Max(b => b.Id) + 1,
+            id: 0,
             name: request.Name,
             volume: request.Volume,
             price: request.Price,
@@ -34,7 +35,16 @@ public class WineCreate : IEndpoint
             bottled: request.Bottled,
             character: request.Character
         );
-        db.Drinks.Add(wine);
+
+        var validator = new WineValidator();
+        var result = validator.Validate(wine);
+
+        if (!result.IsValid)
+        {
+            return Results.BadRequest();
+        }
+
+        wine = service.CreateWine(wine);
         return TypedResults.Ok(new Response(wine.Id));
     }
 }

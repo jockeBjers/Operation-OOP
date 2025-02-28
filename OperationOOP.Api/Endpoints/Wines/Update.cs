@@ -1,4 +1,4 @@
-﻿using System.Reflection.Metadata;
+﻿using OperationOOP.Api.Validators;
 
 namespace OperationOOP.Api.Endpoints.Wines;
 
@@ -11,7 +11,7 @@ public class WineUpdate : IEndpoint
     public record class Request(
         int Id,
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         double AlcoholContent,
@@ -23,7 +23,7 @@ public class WineUpdate : IEndpoint
     public record class Response(
         int Id,
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         double AlcoholContent,
@@ -32,34 +32,38 @@ public class WineUpdate : IEndpoint
         WineCharacter Character
     );
 
-    private static Response Handle(Request request, IDatabase db)
+    private static IResult Handle(Request request, IWineService service)
     {
-        var wine = db.Drinks.OfType<Wine>().FirstOrDefault(b => b.Id == request.Id);
-        if (wine is null)
-        {
-            return null!;
-        }
-        // Update wine
-        wine.Name = request.Name;
-        wine.Volume = request.Volume;
-        wine.Price = request.Price;
-        wine.Quantity = request.Quantity;
-        wine.AlcoholContent = request.AlcoholContent;
-        wine.Type = request.Type;
-        wine.Bottled = request.Bottled;
-        wine.Character = request.Character;
-        //return updated wine
-        return new Response(
-            Id: wine.Id,
-            Name: wine.Name,
-            Volume: wine.Volume,
-            Price: wine.Price,
-            Quantity: wine.Quantity,
-            AlcoholContent: wine.AlcoholContent,
-            Type: wine.Type,
-            Bottled: wine.Bottled,
-            Character: wine.Character
-        );
-    }
+        var wine = service.UpdateWine(new Wine(
+                id: request.Id,
+                name: request.Name,
+                volume: request.Volume,
+                price: request.Price,
+                quantity: request.Quantity,
+                alcoholContent: request.AlcoholContent,
+                type: request.Type,
+                bottled: request.Bottled,
+                character: request.Character
+            ));
 
+        if (wine is null) return Results.NotFound();
+
+        var validator = new WineValidator();
+        var result = validator.Validate(wine);
+
+        if (!result.IsValid) return Results.BadRequest();
+
+        var response = new Response(
+             Id: wine.Id,
+             Name: wine.Name,
+             Volume: wine.Volume,
+             Price: wine.Price,
+             Quantity: wine.Quantity,
+             AlcoholContent: wine.AlcoholContent,
+             Type: wine.Type,
+             Bottled: wine.Bottled,
+             Character: wine.Character
+         );
+        return Results.Ok(response);
+    }
 }

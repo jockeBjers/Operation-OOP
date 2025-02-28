@@ -1,4 +1,6 @@
-﻿namespace OperationOOP.Api.Endpoints.Wines;
+﻿using OperationOOP.Api.Services;
+
+namespace OperationOOP.Api.Endpoints.Wines;
 
 public class WineRemove : IEndpoint
 {
@@ -7,10 +9,12 @@ public class WineRemove : IEndpoint
         .WithSummary("Remove wine");
     public record Response(int Id);
 
-    private static Ok<Response> Handle(int id, IDatabase db)
+    private static IResult Handle(int id, IWineService service)
     {
-        var wine = db.Drinks.OfType<Wine>().FirstOrDefault(b => b.Id == id);
-        db.Drinks.Remove(wine);
-        return TypedResults.Ok(new Response(wine.Id));
+        service.RemoveWine(id);
+
+        if (service.GetWineById(id) is null) return Results.NotFound();
+
+        return TypedResults.Ok(new Response(id));
     }
 }
