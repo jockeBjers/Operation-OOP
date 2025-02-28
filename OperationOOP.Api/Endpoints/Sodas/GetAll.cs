@@ -12,23 +12,23 @@ public class SodaGetAll : IEndpoint
     public record Response(
         int Id,
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         bool IsSugarFree
     );
 
-    private static List<Response> Handle(IDatabase db)
+    private static IResult Handle(ISodaService service)
     {
-        return db.Drinks
-            .OfType<Soda>()
-            .Select(item => new Response(
-                Id: item.Id,
-                Name: item.Name,
-                Volume: item.Volume,
-                Price: item.Price,
-                Quantity: item.Quantity,
-                IsSugarFree: item.IsSugarFree
-            )).ToList();
+        var list = service.GetAllSodas()
+             .Select(item => new Response(
+                 Id: item.Id,
+                 Name: item.Name,
+                 Volume: item.Volume,
+                 Price: item.Price,
+                 Quantity: item.Quantity,
+                 IsSugarFree: item.IsSugarFree
+             )).ToList();
+        return Results.Ok(list);
     }
 }

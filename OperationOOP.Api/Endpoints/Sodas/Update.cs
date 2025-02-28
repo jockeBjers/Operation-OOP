@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using OperationOOP.Api.Validators;
+using System.Reflection.Metadata;
 
 namespace OperationOOP.Api.Endpoints.Sodas;
 
@@ -11,7 +12,7 @@ public class SodaUpdate : IEndpoint
     public record Request(
         int Id,
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         bool IsSugarFree
@@ -20,29 +21,37 @@ public class SodaUpdate : IEndpoint
     public record Response(
         int Id,
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         bool IsSugarFree
     );
 
-    private static Response Handle(Request request, IDatabase db)
+    private static IResult Handle(Request request, ISodaService service)
     {
-        var soda = db.Drinks.OfType<Soda>().FirstOrDefault(b => b.Id == request.Id);
+        var soda = service.UpdateSoda(new Soda(
+            id: request.Id,
+            name: request.Name,
+            volume: request.Volume,
+            price: request.Price,
+            quantity: request.Quantity,
+            isSugarFree: request.IsSugarFree
+        ));
+
         if (soda is null)
         {
-            return null!;
+            return Results.NotFound();
         }
 
-        // Update soda
-        soda.Name = request.Name;
-        soda.Volume = request.Volume;
-        soda.Price = request.Price;
-        soda.Quantity = request.Quantity;
-        soda.IsSugarFree = request.IsSugarFree;
+        var validator = new SodaValidator();
+        var result = validator.Validate(soda);
 
-        //return updated soda
-        return new Response(
+        if (!result.IsValid)
+        {
+            return Results.BadRequest();
+        }
+
+        var response = new Response(
             Id: soda.Id,
             Name: soda.Name,
             Volume: soda.Volume,
@@ -50,5 +59,6 @@ public class SodaUpdate : IEndpoint
             Quantity: soda.Quantity,
             IsSugarFree: soda.IsSugarFree
         );
+        return TypedResults.Ok(response);
     }
 }

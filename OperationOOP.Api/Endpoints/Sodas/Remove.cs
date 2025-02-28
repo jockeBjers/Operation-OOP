@@ -10,12 +10,12 @@ public class SodaRemove : IEndpoint
 
     public record Response(int Id);
 
-
-    private static Ok<Response> Handle(int id, IDatabase db)
+    private static IResult Handle(int id, ISodaService service)
     {
-        var soda = db.Drinks.OfType<Soda>().FirstOrDefault(b => b.Id == id);
-        db.Drinks.Remove(soda);
-        return TypedResults.Ok(new Response(soda.Id));
-    }
+        service.RemoveSoda(id);
 
+        if (service.GetSodaById(id) is null) return Results.NotFound();
+
+        return TypedResults.Ok(new Response(id));
+    }
 }

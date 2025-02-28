@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using OperationOOP.Core.Models;
+using System.Reflection.Metadata;
 
 namespace OperationOOP.Api.Endpoints.Sodas;
 
@@ -14,27 +15,25 @@ public class SodaGet : IEndpoint
     public record Response(
         int Id,
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         bool IsSugarFree
     );
 
-    private static Response Handle([AsParameters] Request request, IDatabase db)
+    private static IResult Handle([AsParameters] Request request, ISodaService service)
     {
-        var beverage = db.Drinks.Find(b => b.Id == request.Id);
-        if (beverage is Soda soda)
-        {
-            var response = new Response(
-                Id: soda.Id,
-                Name: soda.Name,
-                Volume: soda.Volume,
-                Price: soda.Price,
-                Quantity: soda.Quantity,
-                IsSugarFree: soda.IsSugarFree
-            );
-            return response;
-        }
-        return null;
+        var soda = service.GetSodaById(request.Id);
+        if (soda is null) return Results.NotFound();
+
+        var response = new Response(
+              Id: soda.Id,
+              Name: soda.Name,
+              Volume: soda.Volume,
+              Price: soda.Price,
+              Quantity: soda.Quantity,
+              IsSugarFree: soda.IsSugarFree
+          );
+        return Results.Ok(response);
     }
 }

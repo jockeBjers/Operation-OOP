@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using OperationOOP.Api.Validators;
+using System.Reflection.Metadata;
 
 namespace OperationOOP.Api.Endpoints.Sodas;
 
@@ -10,7 +11,7 @@ public class SodaCreate : IEndpoint
 
     public record Request(
         string Name,
-        double Volume,
+        decimal Volume,
         decimal Price,
         int Quantity,
         bool IsSugarFree
@@ -18,10 +19,10 @@ public class SodaCreate : IEndpoint
 
     public record Response(int Id);
 
-    private static Ok<Response> Handle(Request request, IDatabase db)
+    private static IResult Handle(Request request, ISodaService service)
     {
         var soda = new Soda(
-            id: db.Drinks.Max(b => b.Id) + 1,
+            id: 0,
             name: request.Name,
             volume: request.Volume,
             price: request.Price,
@@ -29,8 +30,15 @@ public class SodaCreate : IEndpoint
             isSugarFree: request.IsSugarFree
         );
 
-        db.Drinks.Add(soda);
+        var validator = new SodaValidator();
+        var result = validator.Validate(soda);
 
+        if (!result.IsValid)
+        {
+            return TypedResults.BadRequest(result.Errors);
+        }
+
+        soda = service.CreateSoda(soda);
         return TypedResults.Ok(new Response(soda.Id));
     }
 }
