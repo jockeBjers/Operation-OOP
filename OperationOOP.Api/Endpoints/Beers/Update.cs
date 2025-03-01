@@ -32,44 +32,47 @@ public class BeerUpdate : IEndpoint
 
     private static IResult Handle(Request request, IBeerService service)
     {
-        // Update beer
-        var beer = service.UpdateBeer(new Beer(
-            id: request.Id,
-            name: request.Name,
-            volume: request.Volume,
-            price: request.Price,
-            quantity: request.Quantity,
-            alcoholContent: request.AlcoholContent,
-            type: request.Type,
-            bitterness: request.Bitterness
-        ));
-
-        if (beer is null)
-        {
-            return Results.NotFound();
-        }
+        var beer = new Beer(
+               id: request.Id,
+               name: request.Name,
+               volume: request.Volume,
+               price: request.Price,
+               quantity: request.Quantity,
+               alcoholContent: request.AlcoholContent,
+               type: request.Type,
+               bitterness: request.Bitterness
+           );
 
         var validator = new BeerValidator();
         var result = validator.Validate(beer);
 
         if (!result.IsValid)
         {
-            return Results.BadRequest();
+            return Results.BadRequest(result.Errors.Select(x => new
+            {
+                Field = x.PropertyName,
+                Message = x.ErrorMessage
+            }));
         }
 
-        //return updated beer
-        var response = new Response(
-             Id: beer.Id,
-            Name: beer.Name,
-            Volume: beer.Volume,
-            Price: beer.Price,
-            Quantity: beer.Quantity,
-            AlcoholContent: beer.AlcoholContent,
-            Type: beer.Type,
-            Bitterness: beer.Bitterness
-        );
+        beer = service.UpdateBeer(beer);
 
-        return Results.Ok(response);
+        if (beer is null)
+        {
+            return Results.NotFound();
+        }
+
+        var response = new Response(
+            beer.Id,
+            beer.Name,
+            beer.Volume,
+            beer.Price,
+            beer.Quantity,
+            beer.AlcoholContent,
+            beer.Type,
+            beer.Bitterness
+        );
+        return TypedResults.Ok(response);
     }
 }
 

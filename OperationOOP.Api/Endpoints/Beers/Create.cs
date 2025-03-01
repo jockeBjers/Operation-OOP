@@ -40,7 +40,11 @@ public class BeerCreate : IEndpoint
 
         if (!result.IsValid)
         {
-            return Results.BadRequest();
+            return Results.BadRequest(result.Errors.Select(x => new
+            {
+                Field = x.PropertyName,
+                Message = x.ErrorMessage
+            }));
         }
 
         beer = service.CreateBeer(beer);

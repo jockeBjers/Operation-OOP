@@ -35,7 +35,11 @@ public class SodaCreate : IEndpoint
 
         if (!result.IsValid)
         {
-            return TypedResults.BadRequest(result.Errors);
+            return Results.BadRequest(result.Errors.Select(x => new
+            {
+                Field = x.PropertyName,
+                Message = x.ErrorMessage
+            }));
         }
 
         soda = service.CreateSoda(soda);

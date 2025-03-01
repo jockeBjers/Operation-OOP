@@ -29,36 +29,44 @@ public class SodaUpdate : IEndpoint
 
     private static IResult Handle(Request request, ISodaService service)
     {
-        var soda = service.UpdateSoda(new Soda(
-            id: request.Id,
-            name: request.Name,
-            volume: request.Volume,
-            price: request.Price,
-            quantity: request.Quantity,
-            isSugarFree: request.IsSugarFree
-        ));
 
-        if (soda is null)
-        {
-            return Results.NotFound();
-        }
+       var soda = new Soda(
+               id: request.Id,
+               name: request.Name,
+               volume: request.Volume,
+               price: request.Price,
+               quantity: request.Quantity,
+               isSugarFree: request.IsSugarFree
+        );
 
         var validator = new SodaValidator();
         var result = validator.Validate(soda);
 
         if (!result.IsValid)
         {
-            return Results.BadRequest();
+            return Results.BadRequest(result.Errors.Select(x => new
+            {
+                Field = x.PropertyName,
+                Message = x.ErrorMessage
+            }));
+        }
+
+        soda = service.UpdateSoda(soda);
+
+        if (soda == null)
+        {
+            return Results.NotFound();
         }
 
         var response = new Response(
-            Id: soda.Id,
-            Name: soda.Name,
-            Volume: soda.Volume,
-            Price: soda.Price,
-            Quantity: soda.Quantity,
-            IsSugarFree: soda.IsSugarFree
+            soda.Id,
+            soda.Name,
+            soda.Volume,
+            soda.Price,
+            soda.Quantity,
+            soda.IsSugarFree
         );
+
         return TypedResults.Ok(response);
     }
 }
