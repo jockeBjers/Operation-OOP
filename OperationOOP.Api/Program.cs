@@ -41,6 +41,8 @@ namespace OperationOOP.Api
                 });
             }
 
+            app.UseStaticFiles();
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
