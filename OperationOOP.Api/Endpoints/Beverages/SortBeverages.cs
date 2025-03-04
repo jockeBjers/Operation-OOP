@@ -7,13 +7,13 @@ public class BeverageSort : IEndpoint
         .MapGet("/beverages/sort/{sorting}", Handle)
         .WithSummary("Sort beverages by name, price, or quantity");
 
-    public record Response(int Id, string Name, decimal Price, decimal Volume, int Quantity);
+    public record Response(int Id, string Name, decimal Price, decimal Volume, int Quantity, string Type);
 
     private static IResult Handle([FromQuery] string sortBy, IBeverageService service)
     {
         var sortedDrinks = service.GetSortedBeverages(sortBy);
 
-        var response = sortedDrinks.Select(d => new Response(d.Id, d.Name, d.Price, d.Volume, d.Quantity)).ToList();
+        var response = sortedDrinks.Select(d => new Response(d.Id, d.Name, d.Price, d.Volume, d.Quantity, d.GetType().Name)).ToList();
         return Results.Ok(response);
     }
 }

@@ -12,9 +12,9 @@ public class SodaRemove : IEndpoint
 
     private static IResult Handle(int id, ISodaService service)
     {
-        service.RemoveSoda(id);
-
         if (service.GetSodaById(id) is null) return Results.NotFound();
+
+        service.RemoveSoda(id);
 
         return TypedResults.Ok(new Response(id));
     }
