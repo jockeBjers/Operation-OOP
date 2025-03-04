@@ -9,9 +9,9 @@ public class BeerRemove : IEndpoint
 
     private static IResult Handle(int id, IBeerService service)
     {
-        service.RemoveBeer(id);
-
         if (service.GetBeerById(id) is null) return Results.NotFound();
+
+        service.RemoveBeer(id);
 
         return TypedResults.Ok(new Response(id));
     }

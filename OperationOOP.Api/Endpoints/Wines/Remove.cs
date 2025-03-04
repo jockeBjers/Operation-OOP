@@ -11,9 +11,9 @@ public class WineRemove : IEndpoint
 
     private static IResult Handle(int id, IWineService service)
     {
-        service.RemoveWine(id);
-
         if (service.GetWineById(id) is null) return Results.NotFound();
+
+        service.RemoveWine(id);
 
         return TypedResults.Ok(new Response(id));
     }
